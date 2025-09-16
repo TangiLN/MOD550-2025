@@ -2,21 +2,21 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 list_csv_files=["Exports_goods.csv","External_trades_in_goods.csv","Imports_of_good.csv","Imports_exports_goods_area.csv","Mainland exports.csv"]
-
+# In this example I'll use only the Exports_goods.csv file 
 class DataAcquisition:
     def __init__(self,file):
         self.file=file
-        pass
 
     def acquire_data(self):
         """
         Acquires and processes data from a CSV file.
         The function remove the wrong value and of the dataset and rename the columns to have me clarity on the content
+        I'm only going to use the column "Unnamed: 0",wich is category of exports and "NOK Million" for my analysis
         """
         dataset = pd.read_csv(self.file, sep=";")
         subset = dataset[["Unnamed: 0", "NOK Million","Unnamed: 2"]]
         subset.columns=["Category","Value (NOK million) - July 2024","Value (NOK million) - July 2025"]
-        subset["Value (NOK million) - July 2024"]=pd.to_numeric(subset["Value (NOK million) - July 2024"], errors="coerce")
+        subset["Value (NOK million) - July 2024"]=pd.to_numeric(subset["Value (NOK million) - July 2024"], errors="coerce") #Coerce is to replace the values with NaN
         subset = subset.dropna()
         # Store the clean data array as a class attribute
         self.data_array=subset.to_numpy()
@@ -62,7 +62,6 @@ class DataAcquisition:
         counts, bin_edges = np.histogram(self.values, bins=20, density=True)
         pmf = counts / counts.sum()
         bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-
         plt.plot(bin_centers, pmf, marker="o", linestyle="none", color="green")
         plt.xlabel("Exportations (NOK Million)")
         plt.ylabel("Probability")
