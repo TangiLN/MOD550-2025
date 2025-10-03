@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os 
 list_csv_files=["Exports_goods.csv","External_trades_in_goods.csv","Imports_of_good.csv","Imports_exports_goods_area.csv","Mainland exports.csv"]
 # In this example I'll use only the Exports_goods.csv file 
 class DataAcquisition:
     def __init__(self,file):
+        """ Init function for the class DataAcquisition"""
+        self.chemin_csv = os.path.abspath(os.path.join(os.path.dirname(__file__), file))
         self.file=file
 
     def acquire_data(self):
@@ -13,14 +16,20 @@ class DataAcquisition:
         The function remove the wrong value and of the dataset and rename the columns to have me clarity on the content
         I'm only going to use the column "Unnamed: 0",wich is category of exports and "NOK Million" for my analysis
         """
-        dataset = pd.read_csv(self.file, sep=";")
+        dataset = pd.read_csv(self.chemin_csv, sep=";")
         subset = dataset[["Unnamed: 0", "NOK Million","Unnamed: 2"]]
         subset.columns=["Category","Value (NOK million) - July 2024","Value (NOK million) - July 2025"]
         subset["Value (NOK million) - July 2024"]=pd.to_numeric(subset["Value (NOK million) - July 2024"], errors="coerce") #Coerce is to replace the values with NaN
+        subset["Value (NOK million) - July 2025"]=pd.to_numeric(subset["Value (NOK million) - July 2025"], errors="coerce") #Coerce is to replace the values with NaN
         subset = subset.dropna()
+
         # Store the clean data array as a class attribute
         self.data_array=subset.to_numpy()
-        self.values=self.data_array[:, 1].astype(float)
+        self.values_2024=self.data_array[:, 1].astype(float)
+        print(self.values_2024)
+        self.values_2025=self.data_array[:, 2].astype(float)
+        print(self.values_2025)
+
 
     def bar_plot(self):
         """
@@ -29,9 +38,9 @@ class DataAcquisition:
         I choose to represent the top 10 categories because representing the 100 categories would make the plot unreadable.
         """
         category = self.data_array[:, 0]   # années (probablement en string)
-        top10_idx = np.argsort(self.values)[-10:]   # indices des 10 plus grands
+        top10_idx = np.argsort(self.values_2024)[-10:]   # indices des 10 plus grands
         top10_categories = category[top10_idx]
-        top10_values = self.values[top10_idx]
+        top10_values = self.values_2024[top10_idx]
 
         plt.bar(top10_categories, top10_values, color="orange")
         plt.xticks(rotation=45, ha="right")
@@ -47,7 +56,7 @@ class DataAcquisition:
         """
         values = self.data_array[:, 1].astype(float)  # exportations en NOK million (converti en float)
 
-        plt.hist(self.values, bins=20,color="blue", edgecolor="black")
+        plt.hist(self.values_2024, bins=20,color="blue", edgecolor="black")
         plt.xlabel("Exportations (NOK Million)")
         plt.ylabel("Frequency")
         plt.title("Histogramme des exportations")
@@ -59,7 +68,7 @@ class DataAcquisition:
         Make a PMF plot of the values in the second column.
         The x-axis represents the values (from the second column) and the y-axis represents the probability of these values.
         """
-        counts, bin_edges = np.histogram(self.values, bins=20, density=True)
+        counts, bin_edges = np.histogram(self.values_2024, bins=20, density=True)
         pmf = counts / counts.sum()
         bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
         plt.plot(bin_centers, pmf, marker="o", linestyle="none", color="green")
@@ -73,9 +82,9 @@ class DataAcquisition:
         """
         PMF with bar values, wich is going to be very similar from the histogram plot, but with a better scaling. 
         """
-        counts, self.bins = np.histogram(self.values, bins=10)
+        counts, self.bins = np.histogram(self.values_2024, bins=10)
         self.pmf = counts / counts.sum()
-        # Print to see the number of counts and the PMF self.values
+        # Print to see the number of counts and the PMF self.values_2024
         print("Counts :", counts)
         print("PMF :", self.pmf)
         plt.bar(self.bins[:-1], self.pmf, width=np.diff(self.bins), edgecolor="black", align="edge")

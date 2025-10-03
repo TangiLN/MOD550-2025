@@ -18,4 +18,9 @@ The notebook to run is "Task_1_2"
 The 3 last task are handled by the DataAcquisition class wich is in the folder "Task_3_4_5"
 The notebook to run is "Task_3_4_5"
 
+# Second Task of the project 
+
+- All the functions are stored in the class DataModel in the folder Part_2_Task 
+- The Use of the function DataModel is in the file Exemple_DataModel in the same file
+
 
