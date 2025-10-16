@@ -80,8 +80,8 @@ class DataModel :
     def mean_square_error(self):
         real_data = 2*self.X.ravel().astype(float) # Simulation the real linear coefficient of 2*x
         predicted_data = self.y.ravel().astype(float) # Data predicted with noise 
-        print(real_data)
-        print(predicted_data)
+        print("Real data :" ,real_data)
+        print("Predicted data :",predicted_data)
         error = np.square( predicted_data -real_data)
         mse = np.mean(error)
         print("mean square error", mse)
